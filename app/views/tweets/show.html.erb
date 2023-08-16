@@ -1,0 +1,88 @@
+ <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.14.0/css/all.css">
+<h1>GeekTwitter</h1>
+<h3>Tweet詳細</h3>
+<div class="tweet">
+  <%= image_tag @tweet.image_url, size: "250x250" if @tweet.image? %>
+  <%= video_tag @tweet.video_url ,:controls => true if @tweet.video? %>
+  <p><%= @tweet.body %></p>
+  <p><%= @tweet.created_at.to_s(:datetime_jp) %></p>
+  <% if user_signed_in? %>
+    <% if current_user.already_liked?(@tweet) %>
+      <%= link_to tweet_like_path(@tweet), method: :delete do %>
+        <i class="fas fa-heart"></i><%= @tweet.likes.count %>
+      <% end %>
+    <% else %>
+      <%= link_to tweet_likes_path(id: @tweet.id, tweet_id: @tweet.id), method: :post do %>
+        <i class="far fa-heart"></i><%= @tweet.likes.count %>
+      <% end %>
+    <% end %>
+  <% else %>
+    <p>いいねの数＝</p><%= @tweet.likes.count %>
+  <% end %>
+  <p>tag</p>
+  <% @tweet.tags.each do |tag| %>
+    <span><%= tag.name %></span>
+  <% end %>
+</div>
+
+<h2>いいねしたユーザー</h2>
+<% @tweet.liked_users.each do |user| %>
+  <li><%= user.email %></li>
+<% end %>
+
+
+<div class="comment-wrapper">
+  <p>コメント一覧</p>
+  <% @comments.each do |c| %>
+    <div>
+      ・<%= c.user.email unless c.user.blank? %>:<%= c.content %>
+    </div>
+  <% end %>
+
+  <% if user_signed_in? %>
+    <%= form_with(model: [@tweet, @comment], local: true) do |f| %>
+      <%= f.text_area :content %>
+      <%= button_tag type: "submit" do %>
+       <i class="far fa-comments"></i>コメントする
+      <% end %>
+    <% end %>
+  <% end %>
+</div>
+
+<p>保存機能</p>
+<% if user_signed_in? %>
+  <% if current_user.already_kept?(@tweet) %>
+    <%= link_to tweet_keep_path(@tweet), method: :delete do %>
+      <i class="fas fa-solid fa-bookmark"></i><br>
+    <% end %>
+  <% else %>
+    <%= link_to tweet_keeps_path(@tweet), method: :post do %>
+      <i class="far fa-solid fa-bookmark"></i><br>
+    <% end %>
+  <% end %>
+<% end %>
+
+<%= link_to "編集する", edit_tweet_path(@tweet.id) %>
+
+<%= link_to "Tweet一覧に戻る", tweets_path %>
+
+<% @tagsearch.each do |t| %>
+ <div class="tweet">
+      <a href="/users/<%= t.user.id %>"><%= t.user.name %></a>
+      <div class="main-box">
+        <div class="left-container">
+          <%= t.body %>
+          <% t.tags.each do |tag| %>
+            <span><%= tag.name %></span>
+          <% end %>
+        </div>
+      </div> <!-- main-box -->
+      <p class="time">
+        <%= t.created_at %>
+      </p>
+    </div>
+<% end %>
+
+<br>
+<br>
+<br>

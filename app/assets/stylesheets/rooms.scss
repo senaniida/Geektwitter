@@ -1,0 +1,57 @@
+// Place all the styles related to the rooms controller here.
+// They will automatically be included in application.css.
+// You can use Sass (SCSS) here: https://sass-lang.com/
+
+body {
+    background-color: skyblue;
+    background-image: none;
+}
+
+header {
+    z-index: 7;
+}
+
+
+.rooms-container {
+    z-index: 4;
+    position: relative;
+}
+
+.signpaul {
+    height: 100em;
+    position: absolute;
+    display: block;
+    width: 3vw;
+    left: 4vw;
+    background-repeat: repeat;
+    background-image: url("signpaul2.jpeg");
+    size: 30x30;
+  }
+.box {
+    position: fixed;
+    top: 45vh;
+    left: 3.5vw;
+    width: 2.5vw;
+    height: 19vh;
+    border: 5px solid gray;
+    z-index: 7;
+}
+.hidden-block {
+    display: block;
+    background-color: skyblue;
+    width: 5vw;
+    position: fixed;
+    z-index: 3;
+    left: 3vw;
+    height: 50vh;
+}
+.front {
+    bottom: 55vh;
+}
+.back {
+    top: 65vh;
+}
+
+footer {
+    z-index: 5;
+}

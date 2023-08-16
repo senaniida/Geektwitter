@@ -1,0 +1,59 @@
+<%= stylesheet_link_tag 'roomshow', :media => "all" %>
+<%= link_to "rooms一覧に戻る", rooms_path %>
+
+<br>
+<h4>room名：<%= @room.name %></h4>
+
+<% @users.each do |u| %>
+  <% if u.already_joined?(@room) %>
+    <%= u.name %><br>
+  <% end %>
+<% end %>
+
+<br>
+<h4>メンバーの投稿</h4>
+<% @room.tweets.each do |t| %>
+  〇<%= t.body %>
+  /<%= t.user.name %><br>
+<% end %>
+
+
+
+<br>
+<h4>ranking</h4>
+<% @ranks.each.with_index(1) do |u, i| %>
+  第<%= i %>位：<%= u.name %>✨<br>
+<% end %>
+
+<br>
+<h4>メンバーの投稿：チャット風</h4>
+<% @room.tweets.each do |t| %>
+  <% if user_signed_in? %>
+    <% if t.user.id == current_user.id %>
+      <div class="self-tweet room-tweet">
+        <p>
+          〇<%= t.body %>
+          /自分<br>
+        </p>
+      </div>
+    <% else %>
+      <div class="room-tweet">
+        <P>
+          〇<%= t.body %>
+          /<%= t.user.name %><br>
+        </P>
+      </div>
+    <% end %>  
+  <% else %>
+    <div class="left-display">
+      <p>
+        〇<%= t.body %>
+        /<%= t.user.name %><br>
+      </p>
+    </div>
+  <% end %>
+<% end %>
+
+<br>
+<br>
+<br>

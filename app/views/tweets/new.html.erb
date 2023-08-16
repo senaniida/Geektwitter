@@ -1,0 +1,69 @@
+<%= stylesheet_link_tag 'new', :media => "all" %>
+
+
+<div class="post-container">
+  <p class="title">新規投稿</p>
+  <%= form_for(@newtweet, :url => { controller:'tweets', action:'create'}) do |f| %>
+    <%= f.label :投稿内容 %>
+    <br>
+    <%= f.text_field :body, :size => 140, class: "imput" %>
+    <br>
+    <div class="field">
+      <%= f.label :image %>
+      <%= f.file_field :image %><br>
+      <%= f.label :video %>
+      <%= f.file_field :video %>
+    </div>
+    <div class='form-group'>
+        <% @taggenre.each do |t| %>
+              <p><b><%= t.genre%></b></p>
+          <%= f.collection_check_boxes(:tag_ids, Tag.all, :id, :name) do |tag| %>
+            <% if tag.object.genre == t.genre %>
+              <div class='form-check'>
+                <%= tag.label class: 'form-check-label' do %>
+                  <%= tag.check_box class: 'form-check-input' %>
+                  <%= tag.text %>
+                <% end %>
+              </div>
+            <% end %>
+          <% end %>
+        <% end %>
+      <h5>総合評価</h5>
+      <div class="post_form">
+        <%= f.radio_button :overall, 5 ,id: 'star1'%>
+        <label for="star1"><span class="text">最高</span>★</label>
+
+        <%= f.radio_button :overall, 4 ,id: 'star2'%>
+        <label for="star2"><span class="text">良い</span>★</label>
+
+        <%= f.radio_button :overall, 3 ,id: 'star3'%>
+        <label for="star3"><span class="text">普通</span>★</label>
+
+        <%= f.radio_button :overall, 2 ,id: 'star4'%>
+        <label for="star4"><span class="text">悪い</span>★</label>
+
+        <%= f.radio_button :overall, 1 ,id: 'star5'%>
+        <label for="star5"><span class="text">最悪</span>★</label>
+      </div>
+      <h5>授業レベル</h5>
+      <%= f.number_field :level, max: "5", min: "1" %>
+    </div>
+    <%= f.submit "投稿する" %>
+    room
+    <%= f.select :room_id, @rooms %>
+    <br>
+  <% end %>
+</div>
+
+
+<%= link_to "Tweet一覧に戻る", tweets_path %>
+
+<% @taggenre.each do |g| %>
+  <%= g.genre %>
+<% end %>
+
+<br>
+<br>
+
+
+

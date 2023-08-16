@@ -1,0 +1,7 @@
+<%= form_for(@room, :url => { controller:'rooms', action:'create'}) do |f| %>
+  <%= f.label :room %>
+  <%= f.text_field :name, :size => 140, class: "imput" %>
+  <%= f.submit %>
+<% end %>
+
+<%= link_to "rooms", rooms_path %>

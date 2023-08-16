@@ -1,0 +1,281 @@
+<%= stylesheet_link_tag 'index', :media => "all" %>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/TDi-hGRYX6g" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<br>
+<%= link_to "tweetする", new_tweet_path %>
+<%= link_to 'ログアウト', destroy_user_session_path, method: :delete %>
+<% if user_signed_in? %>
+  <%= link_to"マイページへ", user_path(current_user.id) %>
+<% end %>
+<%= link_to 'スクレイピング', tweets_scraping_path %>
+<a href="/users/<%= current_user.id %>">mypage</a>
+<%= link_to "rooms", rooms_path %>
+<br>
+<h4>ボタンで切り替えできるか？</h4>
+<div class="tab">
+<%= form_tag({controller:"tweets",action:"index"}, method: :get) do %>
+    <%= hidden_field_tag :search, 'radwimps' %>
+    <%= submit_tag 'radwimps' %>
+<% end %>
+<%= form_tag({controller:"tweets",action:"index"}, method: :get) do %>
+    <%= hidden_field_tag :search, 'テスト' %>
+    <%= submit_tag 'テスト' %>
+<% end %>
+<%= form_tag({controller:"tweets",action:"index"}, method: :get) do %>
+    <%= hidden_field :search, 'vaundy' %>
+    <%= submit_tag 'vaundy' %>
+<% end %>
+<%= form_tag({controller:"tweets",action:"index"}, method: :get) do %>
+    <%= submit_tag 'すべて' %>
+<% end %>
+</div>
+<%= image_tag 'radwimps1.jfif', class: "img" %>
+<%= @controller %>
+<h3>日付：<%= @date %></h3>
+
+<%= @url %>
+
+<br>
+<%= page_entries_info @tweets %>
+
+<h2>Tweet一覧</h2>
+<h3>投稿を検索</h3>
+<%= form_tag({controller:"tweets",action:"index"}, method: :get) do %>
+  <%= text_field_tag :search %>
+  <%= text_field_tag :search2 %>
+  <%= submit_tag '検索する' %>
+<% end %>
+
+
+<div class="tweets-container">
+  <% @tweets.each do |t| %>
+  <% @num= @tweets.index(t) %>
+  <%= @num %>
+    <div class="tweet">
+      <a href="/users/<%= t.user.id %>"><%= t.user.name %></a>
+      <div class="ain-box">
+        <div class="left-container">
+          <%#<%= image_tag t.image_url, size: "250x200" if t.image? %>
+          <%= link_to  tweet_path(t.id) do %>
+            <%= image_tag t.image_url, size: "250x250" if t.image? %>
+          <% end %><br>
+          <%= form_tag({controller:"tweets",action:"touser"}, method: :post) do %>
+            <%= hidden_field_tag :tweet, t.id %>
+            <%= submit_tag '投稿者へ' %>
+          <% end %>
+          <%= t.body %>
+          <div>
+            <h5>総合評価：
+              <span class="star-rating">
+                <span class="star-rating-front" style="width: <%= getPercent(t.overall) %>%;">★★★★★</span>
+                <span class="star-rating-back">★★★★★</span>
+              </span>
+            </h5>
+          </div>
+          <div>
+            <h5>授業レベル：
+              <span class="star-rating">
+                <span class="star-rating-front" style="width: <%= getPercent(t.level) %>%;">★★★★★</span>
+                <span class="star-rating-back">★★★★★</span>
+              </span>
+            </h5>
+          </div>
+          <% if user_signed_in? %>
+            <% if current_user.already_liked?(t) %>
+              <%= link_to tweet_like_path(id: t.id, tweet_id: t.id), method: :delete do %>
+                <i class="fas fa-heart"></i><%= t.likes.count %>
+              <% end %>
+            <% else %>
+              <%= link_to tweet_likes_path(id: t.id, tweet_id: t.id), method: :post do %>
+                <i class="far fa-heart"></i><%= t.likes.count %>
+              <% end %>
+            <% end %>
+          <% else %>
+            <p>いいねの数 = </p><%= t.likes.count %>
+          <% end %>
+          <% t.tags.each do |tag| %>
+            <span><%= tag.name %></span>
+          <% end %>
+        </div><!-- left-container -->
+
+        <br>
+        <div class="right-container">
+          <%= link_to "詳細", tweet_path(t.id) %>
+          <%= link_to "編集", edit_tweet_path(t.id) %>
+          <%#= link_to "削除", tweet_path(t.id), method: :delete %>
+          <a href="/tweets/<%= t.id %>"  data-method="delete"><i class="fa-solid fa-trash-can"></i></a>
+        </div>
+      </div> <!-- main-box -->
+      <p class="time">
+        <%= t.created_at.strftime('%Y/%m/%d') %><br>
+        <%= t.created_at.to_s(:datetime_jp) %>
+      </p>
+    </div>
+  <% end %>
+  <%= paginate @tweets %>
+</div>
+
+
+<%= form_tag({controller:"tweets",action:"index"}, method: :get) do %>
+    <% Tag.all.each do |t| %>
+        <li><%= check_box :tag_ids, t.name %><%= t.name %></li>
+    <% end %>
+    <%= submit_tag '検索' %>
+<% end %>
+
+<% @tagId.each do |t| %>
+  <% if t[1] == "1" %>
+    <%= t[0] %>
+  <% end %>
+<% end %>
+
+<% Tag.all.each do |t| %>    
+  <% if t.id == :tag_ids %>
+    <li><%= t.name %></li>  
+  <% end %>
+<% end %>
+<% @i = 0 %>
+<% @tagsearch.each do |t| %>
+ <div class="tweet">
+      <a href="/users/<%= t.user.id %>"><%= t.user.name %></a>
+      <div class="main-box">
+        <div class="left-container">
+          <%= image_tag t.image_url, size: "250x200" if t.image? %><br>
+          <%= t.body %>
+          
+
+          <% if user_signed_in? %>
+            <% if current_user.already_liked?(t) %>
+              <%= link_to tweet_like_path(id: t.id, tweet_id: t.id), method: :delete do %>
+                <i class="fas fa-heart"></i><%= t.likes.count %>
+              <% end %>
+            <% else %>
+              <%= link_to tweet_likes_path(id: t.id, tweet_id: t.id), method: :post do %>
+                <i class="far fa-heart"></i><%= t.likes.count %>
+              <% end %>
+            <% end %>
+          <% else %>
+            <p>いいねの数 = </p><%= t.likes.count %>
+          <% end %>
+          <p>tag</p>
+          <% t.tags.each do |tag| %>
+            <span><%= tag.name %></span>
+          <% end %>
+        </div>
+        <div class="right-container">
+          <%= link_to "詳細", tweet_path(t.id) %>
+          <%= link_to "編集", edit_tweet_path(t.id) %>
+          <%= link_to "削除", tweet_path(t.id), method: :delete %>
+        </div>
+      </div> <!-- main-box -->
+      <p class="time">
+        <%= t.created_at %>
+      </p>
+    </div>
+<% end %>
+
+<% @all_ranks.each do |rank| %>
+  <%= rank.body %>
+<% end %>
+
+
+<br>
+<br>
+
+
+<h2>金額計算機能</h2>
+
+
+<% if false %>
+<%= form_tag({controller:"tweets",action:"index"}, method: :get) do %>
+  <%= check_box_tag :cut, 3000 %>
+  <%= label_tag :cut, "カット" %>
+  <%= check_box_tag :color, 6000 %>
+  <%= label_tag :color, "カラー" %>
+  <%= check_box_tag :perm, 9000 %>
+  <%= label_tag :perm, "パーマ" %>
+  <%= submit_tag '計算する' %>
+<% end %>
+<% end %>
+
+<%= form_tag({controller:"tweets",action:"index"}, method: :get) do %>
+    <%= number_field_tag :cut, '', step: "0.1" %>
+    <%= number_field_tag :color, '', step: "0.1" %>
+    <%= number_field_tag :perm, '', step: 0.1 %>
+
+    <%= radio_button_tag("radio","10") %>
+    <%= label_tag("radio_10","10")%>
+    <%= radio_button_tag("radio","20") %>
+    <%= label_tag("radio_20","20")%>
+    <%= radio_button_tag("radio","30") %>
+    <%= label_tag("radio_30","30")%>
+
+    <%= submit_tag '計算する' %>
+<% end %>
+<%= @radio %>
+<%= @total %>円
+
+
+<br>
+<br>
+<br>
+<br>
+
+<%= @tagtag %>
+<i class="fa-solid fa-location-dot"></i>
+
+<iframe allow="autoplay *; encrypted-media *;" frameborder="0" height="150" style="width:100%;max-width:660px;overflow:hidden;background:transparent;" sandbox="allow-forms allow-popups allow-same-origin allow-scripts allow-storage-access-by-user-activation allow-top-navigation-by-user-activation" src="https://embed.music.apple.com/jp/album/%E6%80%AA%E7%8D%A3%E3%81%AE%E8%8A%B1%E5%94%84/1?i=1510476618"></iframe>
+<br>
+<br>
+
+
+
+<div class="オレンジ">
+  <div class="Ⅰ.ピンク">
+  </div>
+  <div class="Ⅱ.ピンク">
+    <div class="A.紫">
+      <div class="1.青">
+        <h2>2-1.HTML/CSSの概要</h2>
+      </div>
+      <div class="2.青">
+        <div class="a)水色">
+        </div>
+        <div class="b)水色">
+          <p class="(1)黄緑">
+            2-1.・・・
+          </p>
+          <p class="(2)黄緑">
+            2-2.・・・
+          </p>
+          <p class="(3)黄緑">
+            2-3.・・・
+          </p>
+          <p class="(4)黄緑">
+            2-4.・・・
+          </p>
+          <p class="(5)黄緑">
+            2-5.・・・
+          </p>
+        </div>
+      </div>
+      <div class="3.青">
+        <div class="a)水色">
+        </div>
+        <div class="b)水色">
+        </div>
+        <div class="c)水色">
+        </div>
+      </div>
+    </div>
+    <div class="B.紫">
+      <div class="1.青">
+      </div>
+      <div class="2.青">
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<a class="twitter-timeline" data-width="500" data-height="300" data-theme="light" href="https://twitter.com/CrazyRaccoonCup?ref_src=twsrc%5Etfw">Tweets by CrazyRaccoonCup</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+

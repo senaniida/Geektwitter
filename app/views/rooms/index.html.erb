@@ -1,0 +1,17 @@
+<%= stylesheet_link_tag 'rooms', :media => "all" %>
+<div class="rooms-container">
+  <%= link_to "ルームを追加", new_room_path %>
+  <br>
+  <br>
+  <h4>room一覧</h4>
+  <% @rooms.each do |r| %>
+    ・<%= link_to  room_path(r.id) do %><%= r.name %><% end %><br>
+  <% end %>
+</div>
+
+<% @tweets.each do |r| %>
+    ・<%= r.body %><br>
+  <% end %>
+  
+<%= @hisato %>
+

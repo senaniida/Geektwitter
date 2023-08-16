@@ -1,0 +1,81 @@
+<h1>users#show</h1>
+<p>名前：<%= @user.name %></p>
+<p>メールアドレス：<%= @user.email %></p>
+<i class="fab fa-solid fa-location-dot"></i>
+プロフィール：<%= @user.profile %>
+<% if current_user.id == @user.id %>
+  <%= link_to "編集する", edit_user_registration_path %>
+<% end %>
+
+<h2><%= render 'relationships/follow_button', user: @user %></h2>
+
+<h4>follower</h4>
+<% @user.followers.each do |f| %>
+  <p><%= f.name %></p>
+<% end %>
+<h4>following</h4>
+<% @user.followings.each do |f| %>
+  <p><%= f.name %></p>
+<% end %>
+<br>
+
+
+<h2>あなたの投稿一覧</h2>
+<% @tweets.each do |t| %>
+  <p>〇<%= t.body %></p>
+  <% t.comments.each do |c| %>
+    <p>
+      ・<%= c.user.email unless c.user.blank? %>:<%= c.content %>
+    </p>
+  <% end %>
+<% end %>
+<%= paginate @tweets %>
+
+<br>
+<%= link_to "Tweet一覧に戻る", tweets_path %>
+
+<br>
+<br>
+<h4>コメントがついた投稿のみ表示</h4>
+<% @user.tweets.each do |t| %>
+  <% if t.comments.count != 0 %>
+    <p>〇<%= t.body %></p>
+    <% t.comments.each do |c| %>
+      <p>
+        ・<%= c.user.email unless c.user.blank? %>:<%= c.content %>
+      </p>
+    <% end %>
+  <% end %>
+<% end %>
+
+<br>
+<h4>コメントした投稿のみ表示</h4>
+<% @user.comments.each do |c| %>
+  <p>〇<%= c.tweet.body %></p>
+  <p>・<%= c.content %></p>
+<% end %>
+
+
+<h4>所属room</h4>
+<% @rooms.each do |r| %>
+  <% if r.already_joining?(@user) %>
+    <%= r.name %><br>
+  <% end %>
+<% end %>
+
+
+<%# javascript %>
+<%#<input type="hidden" id="sample" value="<%= @userrooms[0].name %>
+<% if false %>
+  <script>
+    window.onload = function() {
+      const sample = document.getElementById('sample').value
+      console.log(sample);
+    } 
+      console.log("Hello world!");
+      alert("20歳以上の方を対象にしたサイトです。20歳未満の方はご利用いただけません。");
+  </script>
+<% end %>
+
+<br>
+<br>

@@ -1,0 +1,10 @@
+<% @elements.each do |ele| %>
+  <%#= ele %>
+  <%#= image_tag ele[:src] %>
+  <img src="<%= ele[:src]%>" width="275">
+<% end %>
+
+<br>
+<% @players.each do |player| %>
+  <%= player.inner_text %><br>
+<% end %>
